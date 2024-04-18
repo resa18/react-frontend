@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import RegistrationForm from './components/RegistrationForm';
+import LoginForm from './components/LoginForm';
+import HomeScreen from './components/HomeScreen';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-function App() {
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const sessionToken = localStorage.getItem('sessionToken');
+    if (sessionToken) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogin = (sessionToken) => {
+    setIsLoggedIn(true);
+    localStorage.setItem('sessionToken', sessionToken);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    localStorage.removeItem('sessionToken');
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/register" element={<RegistrationForm />} />
+        <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
+        <Route
+          path="/"
+          element={isLoggedIn ? <HomeScreen onLogout={handleLogout} /> : <Navigate to="/login" />}
+        />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
